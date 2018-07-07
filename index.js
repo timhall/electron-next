@@ -34,18 +34,14 @@ const adjustRenderer = directory => {
 
   protocol.interceptFileProtocol('file', (request, callback) => {
     let path = request.url.substr(isWindows ? 8 : 7)
+    const relPath = isWindows ? path.replace(parse(path).root, '') : path
 
     for (const replacement of paths) {
-      if (!path.includes(replacement)) {
+      if (!relPath.startsWith(replacement)) {
         continue
       }
 
-      // Strip volume name from path on Windows
-      if (isWindows) {
-        path = path.replace(parse(path).root, '')
-      }
-
-      path = join(directory, 'out', path)
+      path = join(directory, 'out', relPath)
     }
 
     // Electron doesn't like anything in the path to be encoded,
